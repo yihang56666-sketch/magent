@@ -1,0 +1,10 @@
+{
+  "id": "embedded-debug",
+  "pattern": "critic-loop",
+  "phases": [
+    {"name": "build", "identity": "embedded-firmware-engineer", "artifact": "build evidence"},
+    {"name": "observe", "identity": "embedded-firmware-engineer", "artifact": "serial/probe evidence"},
+    {"name": "diagnose", "identity": "embedded-firmware-engineer", "artifact": "root-cause hypothesis"},
+    {"name": "verify", "identity": "qa-test-automation-engineer", "artifact": "verification log"}
+  ]
+}

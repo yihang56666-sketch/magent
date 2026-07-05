@@ -1,0 +1,16 @@
+name: security-review
+pattern: critic-loop
+default_identities:
+  - security-engineer
+  - backend-api-engineer
+  - code-reviewer
+phases:
+  - identify_trust_boundaries
+  - inspect_auth_and_input_paths
+  - classify_findings
+  - verify_mitigations
+  - report_residual_risk
+exit_criteria:
+  - findings have evidence and severity
+  - secrets are not printed
+  - mitigations or open risks are explicit

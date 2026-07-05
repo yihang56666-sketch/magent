@@ -1,0 +1,15 @@
+{
+  "id": "code-review",
+  "title": "Code Review",
+  "summary": "Review a change for correctness, regressions, security risk, and missing tests.",
+  "default_scope": ".",
+  "default_max": 4,
+  "task_template": "Review this change before merge: {task}. Inspect scope: {scope}. Prioritize correctness bugs, regressions, security risk, and missing tests.",
+  "context": "Expected outcome: findings ordered by severity, evidence with file references, test gaps, and merge/no-merge recommendation.",
+  "outcome": "A structured pre-merge review with actionable findings.",
+  "next_steps": [
+    "Run `python .agents/magent.py step latest`.",
+    "Save reviewer outputs into the generated `*.output.md` files.",
+    "Merge results, then fix Critical and Important findings before merge."
+  ]
+}

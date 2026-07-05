@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest a user-facing improvement, new workflow, or new specialist identity.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What workflow pain or user need should this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior and the user journey.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider?
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation idea
+      description: How could maintainers test that this improves the workflow?

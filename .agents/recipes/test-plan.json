@@ -1,0 +1,15 @@
+{
+  "id": "test-plan",
+  "title": "Test Plan",
+  "summary": "Find the highest-value tests for a feature, bug, or risky change.",
+  "default_scope": ".",
+  "default_max": 3,
+  "task_template": "Create a practical test plan for: {task}. Inspect existing coverage and risk areas in scope: {scope}.",
+  "context": "Expected outcome: high-value unit, integration, CLI, and manual smoke tests with exact commands where possible.",
+  "outcome": "A prioritized test plan that targets real risk instead of broad busywork.",
+  "next_steps": [
+    "Run `python .agents/magent.py step latest`.",
+    "Add or run the highest-value tests first.",
+    "Use the plan to decide what verification is enough for the change."
+  ]
+}

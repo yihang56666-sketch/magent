@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Agent Identity Bank"
+  short_description: "Routes tasks to bounded specialist agent identities and skills."
+  default_prompt: "Use $codex-agent-identity-bank to auto-select specialist Codex agent identities and supporting skills for this task."

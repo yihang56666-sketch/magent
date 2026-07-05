@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible problem in the local multi-agent workflow.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened, and what did you expect instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include the exact command and task/scope values when possible.
+      placeholder: |
+        1. Run `python .agents/magent.py run --task "..." --scope "..."`
+        2. Run `python .agents/magent.py next latest`
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Python version, operating system, Codex CLI version, and relevant terminal output.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or generated files
+      description: Paste short excerpts only. Do not include secrets or private task content.
+      render: text

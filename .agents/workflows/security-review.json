@@ -1,0 +1,10 @@
+{
+  "id": "security-review",
+  "pattern": "critic-loop",
+  "phases": [
+    {"name": "threat-scan", "identity": "security-engineer", "artifact": "security findings"},
+    {"name": "api-contract", "identity": "backend-api-engineer", "artifact": "trust-boundary notes"},
+    {"name": "review", "identity": "code-reviewer", "artifact": "risk-ranked issues"},
+    {"name": "verify", "identity": "qa-test-automation-engineer", "artifact": "test recommendations"}
+  ]
+}

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codex Manual Run Dashboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Inter, "Segoe UI", sans-serif;
+            background: #0f1720;
+            color: #d7dee7;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1360px; margin: 0 auto; }
+        .header, .panel, .agent-card, .timeline-item, .modal-content {
+            background: #161f2b;
+            border: 1px solid #2a3646;
+        }
+        .header {
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .header h1 { font-size: 28px; margin-bottom: 8px; color: #f8fafc; }
+        .header p { color: #91a0b5; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .panel {
+            border-radius: 8px;
+            padding: 18px;
+        }
+        .panel h3 {
+            font-size: 12px;
+            color: #8ea0b6;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0;
+        }
+        .stat-value { font-size: 30px; font-weight: 700; color: #f8fafc; }
+        .stat-sub { color: #8ea0b6; font-size: 12px; margin-top: 6px; }
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .agent-card {
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+        }
+        .agent-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            flex: 0 0 auto;
+        }
+        .status-pending { background: #64748b; }
+        .status-completed { background: #22c55e; }
+        .status-failed { background: #ef4444; }
+        .status-running { background: #f59e0b; }
+        .agent-name { font-weight: 600; color: #f8fafc; }
+        .agent-type { color: #8ea0b6; font-size: 12px; margin-bottom: 10px; }
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #9fb0c4;
+        }
+        .timeline {
+            border-radius: 8px;
+            padding: 18px;
+        }
+        .timeline h2 { font-size: 18px; margin-bottom: 14px; }
+        .timeline-item {
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .timeline-time { font-size: 12px; color: #8ea0b6; margin-bottom: 4px; }
+        .timeline-event { color: #f8fafc; font-weight: 600; margin-bottom: 4px; }
+        .timeline-detail {
+            color: #a9b6c7;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .controls {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            border: 1px solid #324255;
+            background: #1d2936;
+            color: #e5ecf4;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button.primary {
+            background: #2563eb;
+            border-color: #2563eb;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            width: min(900px, 100%);
+            max-height: 80vh;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: auto;
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        pre {
+            background: #0f1720;
+            border: 1px solid #2a3646;
+            border-radius: 8px;
+            padding: 16px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #d7dee7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Codex Manual Run Dashboard</h1>
+            <p>Track a local run folder while the current Codex session plays each agent in sequence.</p>
+        </div>
+
+        <div class="stats">
+            <div class="panel">
+                <h3>Total Agents</h3>
+                <div class="stat-value" id="totalAgents">0</div>
+                <div class="stat-sub">Agents in this run</div>
+            </div>
+            <div class="panel">
+                <h3>Completed</h3>
+                <div class="stat-value" id="completedAgents">0</div>
+                <div class="stat-sub">Output files filled</div>
+            </div>
+            <div class="panel">
+                <h3>Pending</h3>
+                <div class="stat-value" id="pendingAgents">0</div>
+                <div class="stat-sub">Still waiting on Codex answers</div>
+            </div>
+            <div class="panel">
+                <h3>Failed</h3>
+                <div class="stat-value" id="failedAgents">0</div>
+                <div class="stat-sub">Output file marked as failed</div>
+            </div>
+        </div>
+
+        <div class="agents-grid" id="agentsGrid"></div>
+
+        <div class="timeline panel">
+            <h2>Run Events</h2>
+            <div id="timelineContent"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="outputModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <strong id="modalTitle">Agent Output</strong>
+                <button onclick="closeModal()">Close</button>
+            </div>
+            <pre id="modalOutput">Loading...</pre>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="loadData()">Refresh</button>
+        <button class="primary" id="autoButton" onclick="toggleAutoRefresh()">Auto Refresh</button>
+    </div>
+
+    <script>
+        let autoRefresh = null;
+        let runDir = "latest";
+
+        function statusClass(status) {
+            if (status === "completed" || status === "completed_cached") return "status-completed";
+            if (status === "failed") return "status-failed";
+            if (status === "pending") return "status-pending";
+            return "status-running";
+        }
+
+        function runParam() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("run") || "latest";
+        }
+
+        async function loadData() {
+            runDir = runParam();
+            try {
+                const summary = await fetch(`/api/runs/${runDir}/summary`).then((res) => res.json());
+                updateStats(summary);
+                updateAgents(summary.results || []);
+                const events = await fetch(`/api/runs/${runDir}/stream`).then((res) => res.json());
+                updateTimeline(events);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function updateStats(summary) {
+            document.getElementById("totalAgents").textContent = summary.total || 0;
+            document.getElementById("completedAgents").textContent = summary.completed || 0;
+            document.getElementById("pendingAgents").textContent = summary.pending || 0;
+            document.getElementById("failedAgents").textContent = summary.failed || 0;
+        }
+
+        function updateAgents(agents) {
+            const grid = document.getElementById("agentsGrid");
+            grid.innerHTML = "";
+            agents.forEach((agent) => {
+                const card = document.createElement("div");
+                card.className = "agent-card";
+                card.onclick = () => showAgentOutput(agent);
+                card.innerHTML = `
+                    <div class="agent-row">
+                        <div class="status-dot ${statusClass(agent.status)}"></div>
+                        <div class="agent-name">${agent.agent_id}</div>
+                    </div>
+                    <div class="agent-type">${agent.identity_id || agent.agent_type || "specialist"}</div>
+                    <div class="meta">
+                        <span>${agent.status}</span>
+                        <span>${agent.execution_role || agent.agent_type || "explorer"}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateTimeline(events) {
+            const container = document.getElementById("timelineContent");
+            container.innerHTML = "";
+            (events || []).slice(-12).reverse().forEach((event) => {
+                const item = document.createElement("div");
+                item.className = "timeline-item";
+                item.innerHTML = `
+                    <div class="timeline-time">${new Date(event.timestamp * 1000).toLocaleTimeString()}</div>
+                    <div class="timeline-event">${event.type}</div>
+                    <div class="timeline-detail">${JSON.stringify(event.data)}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function showAgentOutput(agent) {
+            document.getElementById("modalTitle").textContent = `${agent.agent_id} output`;
+            document.getElementById("modalOutput").textContent = "Loading...";
+            document.getElementById("outputModal").classList.add("active");
+            try {
+                const text = await fetch(`/api/runs/${runDir}/output/${agent.agent_id}`).then((res) => res.text());
+                document.getElementById("modalOutput").textContent = text || "No output yet.";
+            } catch (error) {
+                document.getElementById("modalOutput").textContent = String(error);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById("outputModal").classList.remove("active");
+        }
+
+        function toggleAutoRefresh() {
+            const button = document.getElementById("autoButton");
+            if (autoRefresh) {
+                clearInterval(autoRefresh);
+                autoRefresh = null;
+                button.textContent = "Auto Refresh";
+            } else {
+                autoRefresh = setInterval(loadData, 3000);
+                button.textContent = "Stop Auto Refresh";
+            }
+        }
+
+        document.getElementById("outputModal").addEventListener("click", (event) => {
+            if (event.target.id === "outputModal") closeModal();
+        });
+
+        loadData();
+    </script>
+</body>
+</html>

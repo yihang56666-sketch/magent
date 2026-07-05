@@ -1,0 +1,14 @@
+{
+  "id": "full-review-team",
+  "max_identities": 5,
+  "identities": [
+    "primary-routed-identity",
+    "software-architect",
+    "security-engineer",
+    "code-reviewer",
+    "qa-test-automation-engineer"
+  ],
+  "skills": ["codex-multi-agent-orchestrator", "requesting-code-review", "security-best-practices", "verification-before-completion"],
+  "default_pattern": "supervisor",
+  "policy": "parallel evidence, traffic-controller synthesis, no direct sidecar writes"
+}

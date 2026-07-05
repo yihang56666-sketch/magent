@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codex Manual Live View</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: Inter, "Segoe UI", sans-serif;
+            background: #0f1720;
+            color: #d7dee7;
+            padding: 20px;
+        }
+        .container { max-width: 1480px; margin: 0 auto; }
+        .header, .panel, .agent-card, .event-item {
+            background: #161f2b;
+            border: 1px solid #2a3646;
+            border-radius: 8px;
+        }
+        .header { padding: 22px; margin-bottom: 18px; }
+        .header h1 { font-size: 26px; margin-bottom: 6px; color: #f8fafc; }
+        .header p { color: #90a3b8; }
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+            gap: 18px;
+        }
+        .left, .right { display: flex; flex-direction: column; gap: 18px; }
+        .panel { padding: 18px; }
+        .panel h2 { font-size: 16px; margin-bottom: 12px; }
+        .concurrency {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 8px;
+        }
+        .slot {
+            height: 28px;
+            border-radius: 6px;
+            background: #263240;
+        }
+        .slot.active { background: #2563eb; }
+        .agents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+        }
+        .agent-card { padding: 14px; }
+        .agent-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: #64748b;
+        }
+        .dot.running { background: #f59e0b; }
+        .dot.completed { background: #22c55e; }
+        .dot.failed { background: #ef4444; }
+        .name { font-weight: 600; color: #f8fafc; }
+        .sub { color: #92a4b8; font-size: 12px; }
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-top: 10px;
+            color: #a8b8c9;
+        }
+        canvas {
+            width: 100%;
+            height: 320px;
+            background: #0f1720;
+            border-radius: 8px;
+        }
+        .stats .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #253240;
+        }
+        .stats .row:last-child { border-bottom: 0; }
+        .events {
+            max-height: 520px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .event-item { padding: 10px; }
+        .event-time { font-size: 12px; color: #8ea0b6; margin-bottom: 4px; }
+        .event-type { color: #f8fafc; font-weight: 600; margin-bottom: 4px; }
+        .event-data {
+            font-size: 12px;
+            color: #acbac9;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Codex Manual Live View</h1>
+            <p>Watch the local run folder update while Codex advances through the agent handoff chain.</p>
+        </div>
+
+        <div class="panel" style="margin-bottom:18px;">
+            <h2>Active Manual Slots</h2>
+            <div class="concurrency" id="slots"></div>
+        </div>
+
+        <div class="layout">
+            <div class="left">
+                <div class="panel">
+                    <h2>Run Topology</h2>
+                    <canvas id="graphCanvas"></canvas>
+                </div>
+                <div class="agents-grid" id="agentsGrid"></div>
+            </div>
+            <div class="right">
+                <div class="panel stats">
+                    <h2>Run Summary</h2>
+                    <div class="row"><span>Total</span><strong id="totalAgents">0</strong></div>
+                    <div class="row"><span>Completed</span><strong id="completedAgents">0</strong></div>
+                    <div class="row"><span>Pending</span><strong id="pendingAgents">0</strong></div>
+                    <div class="row"><span>Failed</span><strong id="failedAgents">0</strong></div>
+                    <div class="row"><span>Elapsed</span><strong id="elapsed">0s</strong></div>
+                </div>
+                <div class="panel">
+                    <h2>Event Stream</h2>
+                    <div class="events" id="events"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let summary = { results: [] };
+        let events = [];
+        let started = Date.now();
+
+        function makeSlots() {
+            const container = document.getElementById("slots");
+            for (let i = 0; i < 6; i += 1) {
+                const slot = document.createElement("div");
+                slot.className = "slot";
+                slot.id = `slot-${i}`;
+                container.appendChild(slot);
+            }
+        }
+
+        function markSlots() {
+            const active = summary.results.filter((item) => item.status !== "completed" && item.status !== "failed" && item.status !== "pending").length;
+            for (let i = 0; i < 6; i += 1) {
+                document.getElementById(`slot-${i}`).className = i < active ? "slot active" : "slot";
+            }
+        }
+
+        function drawGraph() {
+            const canvas = document.getElementById("graphCanvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = canvas.offsetWidth;
+            canvas.height = 320;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const items = summary.results || [];
+            if (!items.length) {
+                ctx.fillStyle = "#90a3b8";
+                ctx.font = "14px sans-serif";
+                ctx.fillText("No run data yet", 24, 40);
+                return;
+            }
+
+            const gap = canvas.width / (items.length + 1);
+            items.forEach((item, index) => {
+                const x = gap * (index + 1);
+                const y = 150;
+                if (index > 0) {
+                    ctx.strokeStyle = "#3a495d";
+                    ctx.beginPath();
+                    ctx.moveTo(gap * index, y);
+                    ctx.lineTo(x, y);
+                    ctx.stroke();
+                }
+                ctx.fillStyle = item.status === "completed" ? "#22c55e" : item.status === "failed" ? "#ef4444" : "#f59e0b";
+                ctx.beginPath();
+                ctx.arc(x, y, 18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = "#f8fafc";
+                ctx.font = "12px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText(item.agent_id, x, y + 38);
+            });
+        }
+
+        function renderAgents() {
+            const grid = document.getElementById("agentsGrid");
+            grid.innerHTML = "";
+            (summary.results || []).forEach((item) => {
+                const card = document.createElement("div");
+                card.className = "agent-card";
+                card.innerHTML = `
+                    <div class="agent-top">
+                        <div class="dot ${item.status}"></div>
+                        <div class="name">${item.agent_id}</div>
+                    </div>
+                    <div class="sub">${item.identity_id || item.agent_type || "specialist"}</div>
+                    <div class="meta">
+                        <span>${item.status}</span>
+                        <span>${item.execution_role || item.agent_type || "explorer"}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderStats() {
+            document.getElementById("totalAgents").textContent = summary.total || 0;
+            document.getElementById("completedAgents").textContent = summary.completed || 0;
+            document.getElementById("pendingAgents").textContent = summary.pending || 0;
+            document.getElementById("failedAgents").textContent = summary.failed || 0;
+            document.getElementById("elapsed").textContent = `${Math.floor((Date.now() - started) / 1000)}s`;
+        }
+
+        function renderEvents() {
+            const container = document.getElementById("events");
+            container.innerHTML = "";
+            events.slice(-18).reverse().forEach((event) => {
+                const item = document.createElement("div");
+                item.className = "event-item";
+                item.innerHTML = `
+                    <div class="event-time">${new Date(event.timestamp * 1000).toLocaleTimeString()}</div>
+                    <div class="event-type">${event.type}</div>
+                    <div class="event-data">${JSON.stringify(event.data)}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function loadData() {
+            summary = await fetch("/api/runs/latest/summary").then((res) => res.json());
+            events = await fetch("/api/runs/latest/stream").then((res) => res.json());
+            renderAgents();
+            renderStats();
+            renderEvents();
+            markSlots();
+            drawGraph();
+        }
+
+        makeSlots();
+        loadData();
+        setInterval(renderStats, 1000);
+        setInterval(loadData, 3000);
+    </script>
+</body>
+</html>

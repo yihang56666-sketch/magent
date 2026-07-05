@@ -1,0 +1,15 @@
+{
+  "id": "docs-polish",
+  "title": "Docs Polish",
+  "summary": "Improve onboarding docs so a new user understands what to do next.",
+  "default_scope": "README.md docs",
+  "default_max": 3,
+  "task_template": "Improve documentation usefulness for: {task}. Inspect onboarding, examples, command accuracy, and user journey in scope: {scope}.",
+  "context": "Expected outcome: confusing sections, missing examples, inaccurate commands, and recommended documentation edits.",
+  "outcome": "A practical documentation improvement plan grounded in user tasks.",
+  "next_steps": [
+    "Run `python .agents/magent.py step latest`.",
+    "Use findings to update README, getting started docs, and examples.",
+    "Verify every documented command still works."
+  ]
+}

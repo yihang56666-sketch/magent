@@ -1,0 +1,15 @@
+name: bugfix
+pattern: critic-loop
+default_identities:
+  - qa-test-automation-engineer
+  - code-reviewer
+phases:
+  - reproduce
+  - inspect
+  - patch
+  - verify
+  - review
+exit_criteria:
+  - failing behavior explained
+  - fix verified by command output
+  - regression risk reviewed

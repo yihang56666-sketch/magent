@@ -1,0 +1,11 @@
+{
+  "id": "bugfix",
+  "pattern": "critic-loop",
+  "phases": [
+    {"name": "reproduce", "identity": "qa-test-automation-engineer", "artifact": "failure evidence"},
+    {"name": "investigate", "identity": "primary-routed-identity", "artifact": "root-cause hypothesis"},
+    {"name": "fix", "identity": "primary-routed-identity", "artifact": "bounded patch"},
+    {"name": "review", "identity": "code-reviewer", "artifact": "risk findings"},
+    {"name": "verify", "identity": "qa-test-automation-engineer", "artifact": "verification evidence"}
+  ]
+}

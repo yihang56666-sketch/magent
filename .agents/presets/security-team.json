@@ -1,0 +1,11 @@
+{
+  "id": "security-team",
+  "identities": [
+    "security-engineer",
+    "backend-api-engineer",
+    "code-reviewer",
+    "qa-test-automation-engineer"
+  ],
+  "skills": ["security-best-practices", "api-design", "error-handling", "verification-before-completion"],
+  "default_pattern": "critic-loop"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "embedded-team",
+  "max_identities": 4,
+  "identities": [
+    "embedded-firmware-engineer",
+    "hardware-bringup-engineer",
+    "qa-test-automation-engineer",
+    "code-reviewer"
+  ],
+  "skills": ["gcc", "keil", "jlink", "openocd", "probe-rs", "serial", "can", "workflow"],
+  "default_pattern": "critic-loop",
+  "policy": "hardware side effects require explicit approval"
+}

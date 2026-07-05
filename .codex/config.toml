@@ -1,0 +1,17 @@
+[features]
+multi_agent = true
+
+[agents.explorer]
+config = '.codex/agents/explorer.toml'
+
+[agents.reviewer]
+config = '.codex/agents/reviewer.toml'
+
+[agents.docs-researcher]
+config = '.codex/agents/docs-researcher.toml'
+
+[agents.traffic-controller]
+config = '.codex/agents/traffic-controller.toml'
+
+[agents.implementer]
+config = '.codex/agents/implementer.toml'

@@ -1,0 +1,13 @@
+{
+  "id": "frontend-team",
+  "max_identities": 4,
+  "identities": [
+    "frontend-ui-engineer",
+    "ux-accessibility-engineer",
+    "mobile-engineer",
+    "qa-test-automation-engineer"
+  ],
+  "skills": ["playwright", "frontend-patterns", "verification-before-completion"],
+  "default_pattern": "critic-loop",
+  "policy": "browser and responsive verification required when practical"
+}

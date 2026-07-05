@@ -1,0 +1,15 @@
+{
+  "id": "release-readiness",
+  "title": "Release Readiness",
+  "summary": "Check whether a project is ready to publish, tag, or ship.",
+  "default_scope": ".",
+  "default_max": 4,
+  "task_template": "Assess release readiness for: {task}. Inspect source, docs, tests, packaging, generated artifacts, and user-facing workflows in scope: {scope}.",
+  "context": "Expected outcome: release blockers, warnings, verification commands, documentation gaps, and a concrete go/no-go recommendation.",
+  "outcome": "A release gate report with blockers, warnings, and verification evidence.",
+  "next_steps": [
+    "Run `python .agents/magent.py step latest`.",
+    "Complete the release, docs, QA, and reviewer packets.",
+    "Fix blockers before tagging or publishing."
+  ]
+}

@@ -1,0 +1,16 @@
+name: frontend-polish
+pattern: critic-loop
+default_identities:
+  - frontend-ui-engineer
+  - ux-accessibility-engineer
+  - qa-test-automation-engineer
+phases:
+  - inspect_existing_design
+  - implement_ui
+  - verify_responsive_states
+  - accessibility_pass
+  - browser_check
+exit_criteria:
+  - desktop and mobile considered
+  - interaction states covered
+  - browser verification evidence captured

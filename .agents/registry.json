@@ -1,0 +1,14 @@
+{
+  "name": "codex-multi-agent-project",
+  "version": "1.2.0",
+  "skills": [
+    ".agents/skills/codex-agent-identity-bank",
+    ".agents/skills/codex-multi-agent-orchestrator"
+  ],
+  "identity_catalog": ".agents/skills/codex-agent-identity-bank/references/identities.json",
+  "identity_cards": ".agents/identities",
+  "workflows": ".agents/workflows",
+  "presets": ".agents/presets",
+  "recipes": ".agents/recipes",
+  "run_output": ".agents/reports/runs"
+}

@@ -1,0 +1,12 @@
+{
+  "id": "small-team",
+  "max_identities": 3,
+  "identities": [
+    "primary-routed-identity",
+    "code-reviewer",
+    "qa-test-automation-engineer"
+  ],
+  "skills": ["codex-multi-agent-orchestrator", "verification-before-completion"],
+  "default_pattern": "critic-loop",
+  "policy": "one primary worker, sidecars read-only"
+}

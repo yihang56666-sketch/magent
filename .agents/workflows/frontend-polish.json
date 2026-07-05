@@ -1,0 +1,10 @@
+{
+  "id": "frontend-polish",
+  "pattern": "critic-loop",
+  "phases": [
+    {"name": "inspect-ui", "identity": "frontend-ui-engineer", "artifact": "UI findings"},
+    {"name": "check-mobile", "identity": "mobile-engineer", "artifact": "responsive risks"},
+    {"name": "implement", "identity": "frontend-ui-engineer", "artifact": "UI patch"},
+    {"name": "browser-verify", "identity": "qa-test-automation-engineer", "artifact": "Playwright evidence"}
+  ]
+}

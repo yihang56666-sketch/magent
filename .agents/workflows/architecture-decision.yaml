@@ -1,0 +1,15 @@
+name: architecture-decision
+pattern: group-chat
+default_identities:
+  - software-architect
+  - code-reviewer
+  - technical-writer
+phases:
+  - map_options
+  - domain_check
+  - review_risk
+  - decide_and_document
+exit_criteria:
+  - options compared with tradeoffs
+  - risk register complete
+  - decision rationale documented

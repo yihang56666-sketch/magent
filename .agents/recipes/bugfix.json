@@ -1,0 +1,16 @@
+{
+  "id": "bugfix",
+  "title": "Bug Fix",
+  "summary": "Turn a bug report into root-cause evidence, a patch plan, and regression checks.",
+  "default_scope": ".",
+  "default_max": 4,
+  "task_template": "Fix or investigate this bug: {task}. Focus on root cause, smallest safe patch, and regression tests in scope: {scope}.",
+  "context": "Expected outcome: accepted root-cause evidence, risky assumptions, files to inspect, recommended patch, and verification commands.",
+  "outcome": "A root-cause-focused fix plan with test coverage guidance.",
+  "next_steps": [
+    "Run `python .agents/magent.py step latest`.",
+    "Answer each specialist packet in order.",
+    "Implement only the accepted main-agent fix after synthesis.",
+    "Run the recommended regression command before claiming completion."
+  ]
+}

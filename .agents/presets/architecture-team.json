@@ -1,0 +1,11 @@
+{
+  "id": "architecture-team",
+  "identities": [
+    "software-architect",
+    "llm-agent-engineer",
+    "code-reviewer",
+    "technical-writer"
+  ],
+  "skills": ["writing-plans", "requesting-code-review", "codex-multi-agent-orchestrator"],
+  "default_pattern": "group-chat"
+}

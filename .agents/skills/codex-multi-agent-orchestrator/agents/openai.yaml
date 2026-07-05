@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Multi-Agent Orchestrator"
+  short_description: "Defines bounded Codex subagent roles and handoff protocols."
+  default_prompt: "Use $codex-multi-agent-orchestrator in autopilot mode to decide which Codex subagents to dispatch and keep their roles bounded."

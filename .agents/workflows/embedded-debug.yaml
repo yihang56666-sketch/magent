@@ -1,0 +1,16 @@
+name: embedded-debug
+pattern: critic-loop
+default_identities:
+  - embedded-firmware-engineer
+  - hardware-bringup-engineer
+  - qa-test-automation-engineer
+phases:
+  - identify_target_and_toolchain
+  - build_or_inspect_firmware
+  - observe_logs_or_probe
+  - isolate_fault
+  - verify_on_safe_scope
+exit_criteria:
+  - hardware side effects approved before flash/write
+  - build or log evidence captured
+  - next safe diagnostic listed

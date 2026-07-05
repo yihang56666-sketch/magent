@@ -1,0 +1,51 @@
+# Run artifacts
+.agents/reports/runs/*
+!.agents/reports/runs/.gitkeep
+!.agents/reports/runs/.keep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+dist/
+*.egg-info/
+.coverage
+htmlcov/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temp
+*.tmp
+temp_*
+.temp/
+tests/.manual_test/
+.magent/
+
+# Local executable/build artifacts
+*.exe
+*.dll
+*.pyd
+.agents/build/
+.agents/dist/
+.agents/*.exe

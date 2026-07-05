@@ -1,0 +1,16 @@
+name: refactor
+pattern: critic-loop
+default_identities:
+  - software-architect
+  - code-reviewer
+  - qa-test-automation-engineer
+phases:
+  - map_current_behavior
+  - define_boundaries
+  - implement_incrementally
+  - verify_behavior
+  - review_diff
+exit_criteria:
+  - behavior preserved or intentional deltas listed
+  - tests or checks run
+  - reviewer findings addressed or recorded

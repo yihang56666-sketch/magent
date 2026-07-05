@@ -1,0 +1,16 @@
+name: feature-build
+pattern: sop
+default_identities:
+  - product-engineer
+  - software-architect
+  - qa-test-automation-engineer
+phases:
+  - clarify_acceptance
+  - design
+  - implement
+  - verify
+  - document
+exit_criteria:
+  - acceptance criteria mapped to implementation
+  - verification evidence exists
+  - unresolved assumptions listed

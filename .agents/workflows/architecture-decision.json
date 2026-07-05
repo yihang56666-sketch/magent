@@ -1,0 +1,10 @@
+{
+  "id": "architecture-decision",
+  "pattern": "group-chat",
+  "phases": [
+    {"name": "map-options", "identity": "software-architect", "artifact": "options"},
+    {"name": "domain-check", "identity": "primary-routed-identity", "artifact": "domain constraints"},
+    {"name": "review-risk", "identity": "code-reviewer", "artifact": "risk register"},
+    {"name": "decision", "identity": "software-architect", "artifact": "recommended option"}
+  ]
+}
