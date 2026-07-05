@@ -1,4 +1,20 @@
-# Magent: Codex Multi-Agent Orchestration
+<p align="center">
+  <img src="docs/assets/magent-flow.svg" alt="Magent workflow overview" width="100%">
+</p>
+
+<h1 align="center">Magent: Codex Multi-Agent Orchestration</h1>
+
+<p align="center">
+  <strong>One Codex session. Clear specialist roles. Local evidence you can inspect.</strong>
+</p>
+
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0f766e"></a>
+  <a href=".github/workflows/ci.yml"><img alt="CI: GitHub Actions" src="https://img.shields.io/badge/ci-GitHub%20Actions-2563eb"></a>
+  <img alt="Python 3.10+" src="https://img.shields.io/badge/python-3.10%2B-f59e0b">
+  <img alt="Runtime: local first" src="https://img.shields.io/badge/runtime-local--first-14b8a6">
+  <img alt="Status: publishable" src="https://img.shields.io/badge/maturity-publishable-22c55e">
+</p>
 
 Magent is a source-first toolkit for running disciplined multi-agent workflows
 inside a normal Codex session.
@@ -7,6 +23,16 @@ It does not call an external model API in the default path. Instead, it turns a
 task into a local, auditable set of specialist prompt packets, output files, and
 synthesis steps. The main Codex session stays in charge of final decisions,
 edits, verification, and user communication.
+
+## At A Glance
+
+| Signal | What it means |
+| --- | --- |
+| Compass signal | `magent advise` tells you whether the task is worth opening subagents. |
+| Recipe shelf | Start useful workflows for bugfix, review, release, docs, and tests. |
+| Specialist packets | Each specialist gets a bounded copyable prompt and output file. |
+| Evidence trail | Results merge into `synthesis.md`; the main agent still decides. |
+| Guardrails | Generated runs, caches, binaries, and private task data stay out of Git. |
 
 ## Why This Exists
 
@@ -25,6 +51,19 @@ The project is intentionally practical: it includes ready-made recipes for bug
 fixing, code review, release readiness, documentation polish, and test planning.
 It also includes `magent advise`, a zero-write preflight that tells you whether
 opening a multi-agent run is worth the manual overhead.
+
+## The Shape Of A Run
+
+```mermaid
+flowchart LR
+    A[Task] --> B[magent advise]
+    B -->|small or obvious| C[Keep local]
+    B -->|worth review| D[magent start recipe]
+    D --> E[Specialist packets]
+    E --> F[*.output.md files]
+    F --> G[synthesis.md]
+    G --> H[Main Codex verifies and acts]
+```
 
 ## Current Status
 
