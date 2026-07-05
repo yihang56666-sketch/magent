@@ -148,7 +148,7 @@ Show the next pending specialist packet:
 python .agents/magent.py step latest
 ```
 
-Generated runs live under `.agents/reports/runs/<run-id>/` and are ignored by
+Generated runs live under `.agents/reports/runs/RUN_ID/` and are ignored by
 Git by default.
 
 ## Example Output
@@ -180,10 +180,10 @@ Task looks small or low-risk; manual orchestration likely costs more than it sav
 
 1. Run `advise` to estimate whether orchestration is worth it.
 2. Choose a recipe with `recipes`.
-3. Create a run with `start <recipe>` or `run`.
+3. Create a run with `start RECIPE` or `run`.
 4. Use `step` to print the next pending specialist packet.
 5. Paste the packet into the current Codex session and answer as that bounded role.
-6. Save the answer into the matching `<agent-id>.output.md` file.
+6. Save the answer into the matching `AGENT_ID.output.md` file.
 7. Run `step` again until all agents are complete.
 8. Run `merge-results.py` to build `synthesis.md`.
 9. Let the main Codex session decide what to implement and verify.
