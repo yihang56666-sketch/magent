@@ -1,6 +1,7 @@
 # Role Catalog
 
-Use one role per independent question. All roles are advisory and read-only.
+Use one role per independent question. All roles are advisory and instructed to
+remain read-only; the Skill cannot independently sandbox native subagents.
 
 | Role | Mission | Typical evidence |
 | --- | --- | --- |
@@ -14,4 +15,5 @@ Use one role per independent question. All roles are advisory and read-only.
 
 Create a temporary specialist only when no catalog role states the needed
 expertise. Give it a role title, one mission, explicit allowed sources, required
-evidence, and a stop condition. It inherits every read-only restriction.
+evidence, and a stop condition. Instruct it to follow the same read-only
+restriction and check the worktree after it returns.

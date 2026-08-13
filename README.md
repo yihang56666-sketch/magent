@@ -9,11 +9,15 @@ team, and gather evidence without handing off ownership.
 
 ## Install
 
-Copy `codex-native-subagent-orchestrator/` into your Codex skills directory:
+Copy `codex-native-subagent-orchestrator/` into your Codex skills directory.
+This command stops when that Skill is already installed, avoiding a nested copy:
 
 ```powershell
-Copy-Item -Recurse .\codex-native-subagent-orchestrator `
-  "$env:USERPROFILE\.codex\skills\codex-native-subagent-orchestrator"
+$target = Join-Path $env:USERPROFILE ".codex\skills\codex-native-subagent-orchestrator"
+if (Test-Path -LiteralPath $target) {
+  throw "Skill already exists at $target. Remove or rename it before installing."
+}
+Copy-Item -Recurse .\codex-native-subagent-orchestrator $target
 ```
 
 Restart or open a new Codex task after installation.
@@ -28,17 +32,22 @@ architecture comparison. It instructs Codex to:
 2. Select one to three native subagents for independent questions.
 3. Add a fourth only for a security-sensitive or clearly cross-domain task.
 4. Use built-in roles or generate a tightly bounded temporary specialist.
-5. Give every worker a read-only scope, evidence requirements, and stop
-   condition.
+5. Instruct every worker to remain read-only and give it evidence requirements
+   and a stop condition.
 6. Reconcile results before the main agent edits or makes completion claims.
 
-## Authority
+## Authority And Limits
 
-All delegated subagents are read-only. They can inspect source, run safe
-diagnostics, and provide evidence-based recommendations. They must not edit,
-commit, push, publish, deploy, or change third-party resources.
+The Skill instructs delegated subagents to be read-only. They can inspect
+source, run safe diagnostics, and provide evidence-based recommendations. It
+does not independently sandbox a native subagent, so the main agent checks
+`git diff` and `git status --short` after agents return and investigates any
+unexpected workspace change.
 
-The main Codex agent is the only editor, verifier, and user-facing task owner.
+Subagents must not edit, commit, push, publish, deploy, or change third-party
+resources. The main Codex agent is the only editor, verifier, and user-facing
+task owner.
+
 
 ## Repository Layout
 
@@ -55,8 +64,10 @@ tests/                     Portable structural tests
 
 ```powershell
 python -m unittest discover -s tests -v
-python C:\Users\35182\.codex\skills\.system\skill-creator\scripts\quick_validate.py codex-native-subagent-orchestrator
 ```
+
+If you have OpenAI's `skill-creator` Skill installed, its `quick_validate.py`
+can also validate `codex-native-subagent-orchestrator/`.
 
 ## Non-Goals
 
