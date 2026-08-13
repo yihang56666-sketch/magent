@@ -43,6 +43,13 @@ parallel owners of a task.
    change. The main agent alone edits files, runs final verification, and
    reports task completion.
 
+## Collection Rule
+
+Collect every started agent before reporting task completion. Wait only when a
+result blocks the next decision or when all useful main-agent work is complete;
+then collect outstanding results and account for each one as completed, failed,
+or no longer needed.
+
 ## Failed Agents
 
 If an agent fails, times out, or returns no usable result, record the missing

@@ -9,5 +9,6 @@ This repository distributes a Codex Skill, not a standalone agent runtime.
 - Do not add a CLI, dashboard, model API dependency, telemetry, or manual
   prompt-copy lifecycle without an explicit product decision.
 - Update `tests/test_skill_contract.py` when changing the public Skill contract.
-- Validate with `python -m unittest discover -s tests -v` and the bundled
-  `quick_validate.py` command before claiming a release is ready.
+- Validate with `python -m unittest discover -s tests -v` before claiming a
+  release is ready. Run an external Skill validator only when it is available
+  in the current Codex installation.

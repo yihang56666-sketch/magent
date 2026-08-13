@@ -86,6 +86,12 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("native subagent support", text)
         self.assertIn("spawn_agent", text)
 
+    def test_repository_guidance_requires_only_available_validators(self) -> None:
+        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+
+        self.assertIn("python -m unittest discover -s tests -v", text)
+        self.assertNotIn("bundled\n  `quick_validate.py`", text)
+
     def test_bugfix_example_contains_a_complete_dispatch_packet(self) -> None:
         for name in ("bugfix.md", "code-review.md", "research.md"):
             text = (SKILL / "examples" / name).read_text(encoding="utf-8")
@@ -106,6 +112,10 @@ class SkillContractTests(unittest.TestCase):
 
             self.assertIn("read-only", text, name)
             self.assertIn("Do not modify files", text, name)
+            self.assertIn("shared workspace", text, name)
+            self.assertIn("Do not expand the scope", text, name)
+            self.assertIn("non-mutating and non-networked", text, name)
+            self.assertIn("third-party mutations", text, name)
 
     def test_repository_has_a_dependency_free_ci_check(self) -> None:
         workflow = ROOT / ".github" / "workflows" / "ci.yml"
@@ -126,3 +136,35 @@ class SkillContractTests(unittest.TestCase):
 
         self.assertIn("instructed to remain read-only", text)
         self.assertNotIn("Authority: Advisory and read-only.", text)
+
+    def test_dispatch_contract_accounts_for_a_shared_worktree(self) -> None:
+        text = (SKILL / "references" / "dispatch-contract.md").read_text(encoding="utf-8")
+
+        self.assertIn("shared workspace", text)
+        self.assertIn("Do not revert", text)
+
+    def test_dispatch_contract_limits_diagnostics_to_safe_commands(self) -> None:
+        text = " ".join(
+            (SKILL / "references" / "dispatch-contract.md").read_text(encoding="utf-8").split()
+        )
+
+        self.assertIn("non-mutating and non-networked", text)
+        self.assertIn("Do not run a test", text)
+        self.assertIn("main agent", text)
+
+    def test_skill_collects_started_agents_before_completion(self) -> None:
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+
+        self.assertIn("Collect every started agent", text)
+        self.assertIn("before reporting task completion", text)
+
+    def test_skill_has_all_recovery_and_concurrency_invariants(self) -> None:
+        text = " ".join((SKILL / "SKILL.md").read_text(encoding="utf-8").split())
+
+        for rule in (
+            "spawn_agent is unavailable",
+            "platform's available concurrency",
+            "at most one narrowly scoped replacement",
+            "Collect every started agent",
+        ):
+            self.assertIn(rule, text)
