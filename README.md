@@ -10,14 +10,30 @@ team, and gather evidence without handing off ownership.
 ## Install
 
 Copy `codex-native-subagent-orchestrator/` into your Codex skills directory.
-This command stops when that Skill is already installed, avoiding a nested copy:
+Each command stops when that Skill is already installed, avoiding a nested copy.
+
+Windows PowerShell:
 
 ```powershell
-$target = Join-Path $env:USERPROFILE ".codex\skills\codex-native-subagent-orchestrator"
+$codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE ".codex" }
+$target = Join-Path $codexHome "skills\codex-native-subagent-orchestrator"
 if (Test-Path -LiteralPath $target) {
   throw "Skill already exists at $target. Remove or rename it before installing."
 }
+New-Item -ItemType Directory -Force (Split-Path -Parent $target) | Out-Null
 Copy-Item -Recurse .\codex-native-subagent-orchestrator $target
+```
+
+macOS/Linux shell:
+
+```bash
+target="${CODEX_HOME:-$HOME/.codex}/skills/codex-native-subagent-orchestrator"
+if [ -e "$target" ]; then
+  printf 'Skill already exists at %s\n' "$target" >&2
+  exit 1
+fi
+mkdir -p "$(dirname "$target")"
+cp -R ./codex-native-subagent-orchestrator "$target"
 ```
 
 Restart or open a new Codex task after installation.

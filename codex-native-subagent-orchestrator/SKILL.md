@@ -1,6 +1,6 @@
 ---
 name: codex-native-subagent-orchestrator
-description: Route general tasks to the smallest effective set of Codex native subagents. Use when a task benefits from parallel investigation, independent review, specialist analysis, test strategy, security review, research, architecture comparison, or explicit subagent delegation. Keep small or tightly coupled tasks local. Delegate read-only evidence work only; the main agent remains the sole editor, verifier, and user-facing owner.
+description: Use when a Codex task needs parallel investigation, independent review, specialist analysis, test strategy, security review, research, architecture comparison, or explicit subagent delegation.
 ---
 
 # Native Subagent Orchestrator
@@ -38,6 +38,14 @@ parallel owners of a task.
    and `git status --short` after agents return; stop and review any unexpected
    workspace change. The main agent alone edits files, runs final verification,
    and reports task completion.
+
+## Failed Agents
+
+If an agent fails, times out, or returns no usable result, record the missing
+question, continue independent work, and decide whether the main agent can
+close the gap locally. Do not wait indefinitely and do not replace a failed
+agent with a broader, overlapping assignment. Use at most one narrowly scoped
+replacement when its answer still changes the next main-agent decision.
 
 ## Dispatch Rules
 

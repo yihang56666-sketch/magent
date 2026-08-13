@@ -23,6 +23,13 @@ class SkillContractTests(unittest.TestCase):
         ):
             self.assertTrue((SKILL / "references" / reference).is_file())
 
+    def test_description_is_a_short_activation_rule(self) -> None:
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+        description = next(line for line in text.splitlines() if line.startswith("description:"))
+
+        self.assertTrue(description.startswith("description: Use when"))
+        self.assertLess(len(description), 500)
+
     def test_skill_keeps_subagents_read_only_and_bounded(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
 
@@ -51,6 +58,9 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("python -m unittest discover -s tests -v", text)
         self.assertIn("Test-Path", text)
         self.assertIn("already exists", text)
+        self.assertIn("New-Item -ItemType Directory", text)
+        self.assertIn("mkdir -p", text)
+        self.assertIn("$env:CODEX_HOME", text)
 
     def test_bugfix_example_contains_a_complete_dispatch_packet(self) -> None:
         for name in ("bugfix.md", "code-review.md", "research.md"):
@@ -59,12 +69,19 @@ class SkillContractTests(unittest.TestCase):
             for heading in (
                 "## Identity",
                 "## Mission",
+                "## Current Situation",
                 "## Allowed Scope",
+                "## Allowed Actions",
                 "## Forbidden Actions",
                 "## Required Evidence",
+                "## Output Contract",
+                "## Conflict Policy",
                 "## Stop Condition",
             ):
                 self.assertIn(heading, text, name)
+
+            self.assertIn("read-only", text, name)
+            self.assertIn("Do not modify files", text, name)
 
     def test_repository_has_a_dependency_free_ci_check(self) -> None:
         workflow = ROOT / ".github" / "workflows" / "ci.yml"
@@ -72,3 +89,15 @@ class SkillContractTests(unittest.TestCase):
 
         self.assertIn("python -m unittest discover -s tests -v", text)
         self.assertIn("windows-latest", text)
+
+    def test_skill_handles_failed_or_missing_agent_results(self) -> None:
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+
+        self.assertIn("fails, times out, or returns no usable result", text)
+        self.assertIn("Do not wait indefinitely", text)
+
+    def test_dispatch_contract_does_not_claim_permission_enforcement(self) -> None:
+        text = (SKILL / "references" / "dispatch-contract.md").read_text(encoding="utf-8")
+
+        self.assertIn("instructed to remain read-only", text)
+        self.assertNotIn("Authority: Advisory and read-only.", text)
