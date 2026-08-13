@@ -1,0 +1,7 @@
+interface:
+  display_name: "Native Subagent Orchestrator"
+  short_description: "Delegate Codex subagents with clear boundaries."
+  default_prompt: "Use $codex-native-subagent-orchestrator to decide and coordinate bounded native subagents for this task."
+
+policy:
+  allow_implicit_invocation: true

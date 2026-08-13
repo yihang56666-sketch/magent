@@ -1,15 +1,13 @@
-# Codex Multi-Agent Project Instructions
+# Repository Guidance
 
-This repository contains a project-local multi-agent identity bank and orchestration layer for Codex.
+This repository distributes a Codex Skill, not a standalone agent runtime.
 
-Before acting on a request here, read the mandatory skill gate from your local
-Codex skills directory, usually `~/.codex/skills/using-superpowers/SKILL.md`.
-
-Use .agents/skills/codex-agent-identity-bank/SKILL.md for role and skill routing.
-Use .agents/skills/codex-multi-agent-orchestrator/SKILL.md for dispatch boundaries, traffic control, and synthesis.
-
-Project-local Codex roles are wired in .codex/config.toml: explorer, reviewer, docs-researcher, traffic-controller, and implementer.
-
-Generate deterministic routing with python .agents/scripts/spawn-team.py --task TASK --scope SCOPE.
-
-The main Codex agent owns final decisions, verification claims, and the user response. Subagents are bounded evidence producers or delegated workers and must not claim final completion.
+- Keep `codex-native-subagent-orchestrator/SKILL.md` concise and procedural.
+- Put detailed routing, role, packet, and pattern material under `references/`.
+- Keep every delegated role read-only. The main agent is the only writer,
+  verifier, and user-facing owner.
+- Do not add a CLI, dashboard, model API dependency, telemetry, or manual
+  prompt-copy lifecycle without an explicit product decision.
+- Update `tests/test_skill_contract.py` when changing the public Skill contract.
+- Validate with `python -m unittest discover -s tests -v` and the bundled
+  `quick_validate.py` command before claiming a release is ready.
