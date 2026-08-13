@@ -21,10 +21,13 @@ parallel owners of a task.
 4. Select catalog roles from [the role catalog](references/role-catalog.md). If
    none fits, create one temporary specialist instructed to remain read-only,
    following that file.
-5. Before dispatching, capture `git status --short` and inspect whether native
-   `spawn_agent` is available. If `spawn_agent is unavailable`, say that native
-   delegation cannot run in this session and continue locally; do not simulate
-   agents with prompt-copy files.
+5. Before dispatching, inspect whether native `spawn_agent` is available. If
+   `spawn_agent is unavailable`, say that native delegation cannot run in this
+   session and continue locally; do not simulate agents with prompt-copy files.
+   In a Git worktree, capture `git status --short`; if the baseline is already
+   dirty, identify those entries as pre-existing and do not attribute
+   pre-existing changes to a subagent. If this is not a Git repository, skip
+   the Git baseline and use direct file inspection for any unexpected changes.
 6. Build every packet using [the dispatch contract](references/dispatch-contract.md).
 7. Call `spawn_agent` only for independent evidence work. Give each agent one
    concrete mission and a non-overlapping question or source scope. Instruct
@@ -34,10 +37,11 @@ parallel owners of a task.
 8. Continue useful main-agent work while agents run. Do not wait immediately
    unless their result blocks the next main-agent decision.
 9. Reconcile returned findings as evidence. Resolve conflicts with source
-   checks, one bounded follow-up, or a direct local check. Inspect `git diff`
-   and `git status --short` after agents return; stop and review any unexpected
-   workspace change. The main agent alone edits files, runs final verification,
-   and reports task completion.
+   checks, one bounded follow-up, or a direct local check. In a Git worktree,
+   inspect `git diff` and `git status --short` after agents return; otherwise,
+   inspect the scoped files directly. Stop and review any unexpected workspace
+   change. The main agent alone edits files, runs final verification, and
+   reports task completion.
 
 ## Failed Agents
 
@@ -55,8 +59,9 @@ replacement when its answer still changes the next main-agent decision.
   subagent to remain read-only and do not delegate file writes, commits, pushes,
   publishing, deployment, credential changes, or third-party mutations. Check
   the worktree after it returns.
-- Compare the post-dispatch `git status --short` with the captured baseline.
-  Do not discard or revert a change before determining whether it came from the
+- In a Git worktree, compare the post-dispatch `git status --short` with the
+  captured baseline. Do not attribute pre-existing changes to a subagent, and
+  do not discard or revert a change before determining whether it came from the
   user, the main agent, or a subagent.
 - Keep each agent scoped to facts it can establish independently. Do not assign
   multiple agents the same broad codebase tour.

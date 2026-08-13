@@ -51,6 +51,24 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("spawn_agent is unavailable", text)
         self.assertIn("platform's available concurrency", text)
 
+    def test_skill_preserves_preexisting_worktree_changes(self) -> None:
+        text = " ".join((SKILL / "SKILL.md").read_text(encoding="utf-8").split())
+
+        self.assertIn("baseline is already dirty", text)
+        self.assertIn("Do not attribute pre-existing changes", text)
+
+    def test_skill_degrades_cleanly_outside_a_git_repository(self) -> None:
+        text = " ".join((SKILL / "SKILL.md").read_text(encoding="utf-8").split())
+
+        self.assertIn("not a Git repository", text)
+        self.assertIn("skip the Git baseline", text)
+
+    def test_dispatch_contract_prevents_scope_expansion(self) -> None:
+        text = (SKILL / "references" / "dispatch-contract.md").read_text(encoding="utf-8")
+
+        self.assertIn("Do not expand the scope", text)
+        self.assertIn("Stop after answering the mission", text)
+
     def test_readme_uses_portable_validation_instructions(self) -> None:
         text = README.read_text(encoding="utf-8")
 
@@ -61,6 +79,12 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("New-Item -ItemType Directory", text)
         self.assertIn("mkdir -p", text)
         self.assertIn("$env:CODEX_HOME", text)
+
+    def test_readme_states_the_native_subagent_prerequisite(self) -> None:
+        text = README.read_text(encoding="utf-8")
+
+        self.assertIn("native subagent support", text)
+        self.assertIn("spawn_agent", text)
 
     def test_bugfix_example_contains_a_complete_dispatch_packet(self) -> None:
         for name in ("bugfix.md", "code-review.md", "research.md"):
@@ -89,6 +113,7 @@ class SkillContractTests(unittest.TestCase):
 
         self.assertIn("python -m unittest discover -s tests -v", text)
         self.assertIn("windows-latest", text)
+        self.assertIn('"on":', text)
 
     def test_skill_handles_failed_or_missing_agent_results(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")

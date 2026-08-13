@@ -23,6 +23,8 @@ Users report occasional login failures. The main agent will make any fix.
 ## Allowed Scope
 Inspect `src/auth/`, its direct callers, and existing login tests.
 
+Do not expand the scope. Report an out-of-scope dependency as an open question.
+
 ## Allowed Actions
 Search and inspect files. Run existing targeted tests or non-mutating
 diagnostics.

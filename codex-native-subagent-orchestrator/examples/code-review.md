@@ -20,6 +20,8 @@ The main agent is preparing a focused authentication change for review.
 Inspect the current diff, changed files, directly related callers, and existing
 authentication tests.
 
+Do not expand the scope. Report an out-of-scope dependency as an open question.
+
 ## Allowed Actions
 Search and inspect files. Run existing targeted tests or non-mutating
 diagnostics.

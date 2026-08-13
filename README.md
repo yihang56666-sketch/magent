@@ -38,6 +38,10 @@ cp -R ./codex-native-subagent-orchestrator "$target"
 
 Restart or open a new Codex task after installation.
 
+This Skill requires a Codex session with native subagent support and access to
+`spawn_agent` to delegate work. When that capability is unavailable, it directs
+the main agent to continue locally instead of simulating subagents.
+
 ## What It Does
 
 The Skill activates for work that benefits from independent investigation,

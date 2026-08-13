@@ -20,6 +20,8 @@ The main agent needs an evidence-backed answer before changing an integration.
 Inspect official vendor documentation and the local integration code needed to
 relate those docs to the task.
 
+Do not expand the scope. Report an out-of-scope dependency as an open question.
+
 ## Allowed Actions
 Read official documentation, search public sources, and inspect local files.
 
