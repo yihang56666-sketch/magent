@@ -39,6 +39,7 @@ Thumbs.db
 *.tmp
 temp_*
 .temp/
+.worktrees/
 tests/.manual_test/
 .magent/
 
