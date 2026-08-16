@@ -1,18 +1,84 @@
-# Codex Native Subagent Orchestrator
+# Codex 原生子智能体编排 Skill
 
-A portable Codex Skill for choosing, briefing, and reconciling native
-subagents on general tasks.
+一个帮助 Codex 主智能体判断、路由和汇总原生子智能体工作的通用 Skill。
 
-It is a workflow layer, not a separate agent runtime. It helps the main Codex
-agent decide when delegation earns its coordination cost, use a small bounded
-team, and gather evidence without handing off ownership.
+一句话定位：原生 `spawn_agent` 是执行引擎，本 Skill 是决策、路由、安全、恢复与结果汇总层。它不是独立的多智能体运行时，也不会替主智能体接管最终写入和交付责任。
 
-## Install
+## 它解决什么问题
 
-Copy `codex-native-subagent-orchestrator/` into your Codex skills directory.
-Each command stops when that Skill is already installed, avoiding a nested copy.
+复杂任务经常同时需要代码定位、测试策略、架构比较、文档研究或安全检查。直接把整项任务交给多个智能体，容易造成重复劳动、范围膨胀、共享工作区冲突和无法验证的结论。本 Skill 将协作拆成有边界的证据生产流程：先判断是否值得分派，再为每个子智能体定义一个独立问题、允许的操作、证据要求和停止条件。
 
-Windows PowerShell:
+## 原生子智能体与本 Skill 有什么区别
+
+| 能力 | 原生 `spawn_agent` | 本 Skill 增加的编排层 |
+| --- | --- | --- |
+| 执行 | 创建并运行子智能体 | 根据任务风险和依赖决定是否创建 |
+| 分工 | 由主智能体临时描述 | 使用角色目录、分派契约和工作流模式 |
+| 范围 | 取决于提示词 | 明确允许范围、禁止范围和停止条件 |
+| 安全 | 不提供独立权限沙箱 | 强调只读指令、工作区基线和变更审计 |
+| 失败 | 由调用方自行处理 | 处理失败、超时、空结果和有限替补 |
+| 交付 | 返回若干消息 | 主智能体核对证据后统一验证、编辑和汇总 |
+
+## 核心优势
+
+- **降低分派成本**：简单、紧耦合或需要立即修改的工作默认留在主智能体本地。
+- **问题边界清晰**：每个子智能体只回答一个可验证的问题，不能自行扩大范围。
+- **默认小团队**：通常使用 1 到 3 个子智能体，只有安全敏感或明显跨领域的任务才考虑第 4 个。
+- **结果可审计**：要求返回文件、行号、命令输出或其他具体证据，而不是只给泛泛建议。
+- **主智能体保留所有权**：子智能体只能提供只读调查结果，主智能体仍是唯一写入者、验证者和用户交互负责人。
+
+## 什么时候适合使用
+
+适合把任务拆成相互独立的调查问题时使用，例如：
+
+- 一个缺陷需要同时定位调用链和设计回归测试；
+- 需要对多个架构方案分别做独立比较；
+- 代码审查、性能分析、安全检查或资料研究可以并行进行；
+- 主智能体需要先收集证据，再决定实现方案。
+
+## 什么时候不应该分派
+
+以下情况通常应由主智能体直接完成：单文件的小改动、强顺序依赖的调试、需要持续共享中间状态的实现、只需一次命令即可回答的问题，以及分派和协调成本高于调查本身的任务。不要为了“使用更多智能体”而分派；本 Skill 不承诺更多智能体一定更快或质量一定更高。
+
+## 完整工作流程
+
+1. **检查任务与环境**：识别目标、风险、依赖、Git 状态和可用并发容量。
+2. **做本地/分派判断**：读取分派准则；不值得并行时直接继续本地工作。
+3. **选择角色与模式**：优先使用角色目录中的专家，必要时创建一个临时专家；选择调查、对照审查或分阶段汇总模式。
+4. **建立分派包**：写明身份、使命、当前情况、允许/禁止操作、证据格式、冲突策略和停止条件。
+5. **并行收集证据**：所有子智能体保持只读，使用安全、非变更性的诊断命令，不编辑、提交、推送或修改第三方资源。
+6. **处理异常结果**：对失败、超时、空结果或互相矛盾的报告做有限恢复和源代码复核，不无限等待。
+7. **主智能体核验并交付**：检查工作区是否出现意外变化，综合证据，完成实现、测试、最终审查和用户汇总。
+
+## 角色系统与动态临时专家
+
+内置角色覆盖缺陷调查、代码审查、研究、测试策略和架构比较。角色目录负责说明每类专家应回答的问题和应提交的证据。若任务需要目录中没有的视角，可以创建一个**动态临时专家**，但必须给它单一使命、有限来源范围、只读约束和明确停止条件；临时角色不能成为“什么都看一遍”的泛化代理。
+
+## 失败与超时
+
+子智能体可能失败、超时或返回没有用的结果。主智能体不应无限等待，也不应因为一个报告缺失就扩大其他代理的范围。应记录缺失的问题，利用已有证据继续工作；只有当缺失结果确实改变下一步决策时，才允许一次范围相同且更窄的替补分派。无论是否成功，都要收集已经启动的子智能体并在完成前核对工作区。
+
+## 安全边界与只读约束
+
+只读行为来自明确的分派指令和主智能体的工作区审计，不是独立的权限沙箱。子智能体不得编辑文件、提交代码、推送仓库、发布内容、部署服务、改动凭据或执行第三方变更。共享工作区中若已有用户修改，主智能体必须先记录基线，不能把预先存在的变化归因于子智能体，也不能擅自恢复或删除它们。
+
+## 使用示例
+
+当用户要求“修复一个偶发的 API 超时问题”时，主智能体可以分派：
+
+```text
+专家 A：只读检查请求入口、重试和超时配置，报告具体文件与行号。
+专家 B：只读检查现有测试，提出最小回归测试方案，不修改测试文件。
+专家 C：只读比较日志中的时间线与调用链，指出可能的阻塞点。
+```
+
+主智能体收集三份报告，解决冲突并验证证据后，才编辑实现和测试。若原生 `spawn_agent` 不可用，则跳过模拟分派，直接在本地完成相同的调查。
+
+## 安装
+
+将 `codex-native-subagent-orchestrator/` 复制到 Codex skills 目录。若目标已存在，命令会停止，避免嵌套复制。
+
+Windows PowerShell：
 
 ```powershell
 $codexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $env:USERPROFILE ".codex" }
@@ -24,7 +90,7 @@ New-Item -ItemType Directory -Force (Split-Path -Parent $target) | Out-Null
 Copy-Item -Recurse .\codex-native-subagent-orchestrator $target
 ```
 
-macOS/Linux shell:
+macOS/Linux shell：
 
 ```bash
 target="${CODEX_HOME:-$HOME/.codex}/skills/codex-native-subagent-orchestrator"
@@ -36,66 +102,49 @@ mkdir -p "$(dirname "$target")"
 cp -R ./codex-native-subagent-orchestrator "$target"
 ```
 
-Restart or open a new Codex task after installation.
+安装后重启 Codex 或打开新的任务。
 
-This Skill requires a Codex session with native subagent support and access to
-`spawn_agent` to delegate work. When that capability is unavailable, it directs
-the main agent to continue locally instead of simulating subagents.
+## 前置条件
 
-## What It Does
+需要一个支持原生子智能体（`native subagent support`）的 Codex 会话，并且可以访问 `spawn_agent`。如果当前平台不提供该能力，Skill 会要求主智能体继续本地执行，而不是用复制提示词的方式伪造子智能体。
 
-The Skill activates for work that benefits from independent investigation,
-specialist analysis, review, test strategy, security assessment, research, or
-architecture comparison. It instructs Codex to:
-
-1. Keep trivial, narrow, or tightly coupled work local.
-2. Select one to three native subagents for independent questions.
-3. Add a fourth only for a security-sensitive or clearly cross-domain task.
-4. Use built-in roles or generate a tightly bounded temporary specialist.
-5. Instruct every worker to remain read-only and give it evidence requirements
-   and a stop condition.
-6. Reconcile results before the main agent edits or makes completion claims.
-
-## Authority And Limits
-
-The Skill instructs delegated subagents to be read-only. They can inspect
-source, run safe diagnostics, and provide evidence-based recommendations. It
-does not independently sandbox a native subagent, so the main agent checks
-`git diff` and `git status --short` after agents return and investigates any
-unexpected workspace change.
-
-Subagents must not edit, commit, push, publish, deploy, or change third-party
-resources. The main Codex agent is the only editor, verifier, and user-facing
-task owner.
-
-
-## Repository Layout
+## 仓库结构
 
 ```text
 codex-native-subagent-orchestrator/
-  SKILL.md                 Core workflow
-  references/              Routing, roles, packets, and patterns
-  examples/                Bugfix, review, and research examples
-  agents/openai.yaml       Codex UI metadata
-tests/                     Portable structural tests
+  SKILL.md                 运行时编排流程
+  references/              分派准则、角色、契约和工作流模式
+  examples/                缺陷、审查和研究分派示例
+  agents/openai.yaml       Codex 界面元数据
+tests/                     无依赖结构契约测试
 ```
 
-## Verify
+## 验证
 
 ```powershell
 python -m unittest discover -s tests -v
 ```
 
-If you have OpenAI's `skill-creator` Skill installed, its `quick_validate.py`
-can also validate `codex-native-subagent-orchestrator/`.
+如果本机安装了 OpenAI `skill-creator` Skill，也可以使用其中的 `quick_validate.py` 检查 `codex-native-subagent-orchestrator/`。没有该验证器时，以仓库自带契约测试为准，不虚构验证结果。
 
-## Non-Goals
+## 限制与非目标
 
-- No Python CLI, dashboard, local run-state store, or manual prompt-copy loop.
-- No model API client or hosted service.
-- No automatic external actions.
-- No promise that using more agents always improves a task.
+- 不提供 Python CLI、仪表板、本地运行状态数据库或手工提示词复制流程。
+- 不包含模型 API 客户端、托管服务或遥测系统。
+- 不自动执行外部发布、部署、推送或第三方资源变更。
+- 不替代主智能体的权限控制、代码审查和最终测试。
+- 不保证并行一定带来速度或质量提升。
+
+## 常见问题
+
+**它会自动修改代码吗？** 不会。子智能体只读；主智能体在核对证据后负责所有编辑和验证。
+
+**没有 `spawn_agent` 能用吗？** 可以。它会退化为本地工作流，不会创建虚假的子智能体。
+
+**为什么限制团队规模？** 大团队会增加协调、重复调查和冲突成本；默认 1 到 3 个足以覆盖大多数独立问题。
+
+**共享工作区安全吗？** Skill 要求先记录 Git 基线、保留已有修改并在子智能体返回后审计状态，但这不是独立的权限沙箱。
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT，详见 [LICENSE](LICENSE)。

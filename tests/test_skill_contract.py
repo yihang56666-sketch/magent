@@ -86,6 +86,23 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("native subagent support", text)
         self.assertIn("spawn_agent", text)
 
+    def test_readme_is_a_detailed_chinese_product_guide(self) -> None:
+        text = README.read_text(encoding="utf-8")
+
+        for phrase in (
+            "Codex 原生子智能体编排",
+            "原生子智能体与本 Skill",
+            "什么时候适合使用",
+            "什么时候不应该分派",
+            "完整工作流程",
+            "动态临时专家",
+            "失败与超时",
+            "安全边界",
+            "使用示例",
+            "常见问题",
+        ):
+            self.assertIn(phrase, text)
+
     def test_repository_guidance_requires_only_available_validators(self) -> None:
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
 
