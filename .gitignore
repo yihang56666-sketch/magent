@@ -35,3 +35,8 @@ Thumbs.db
 temp_*
 .temp/
 .worktrees/
+
+# 已废弃的 v2 产品计划文档：描述从未落地的 Python CLI/仪表盘产品，
+# 与 README 的「限制与非目标」直接矛盾（见 docs/superpowers/specs/2026-08-15 设计稿的卫生要求）。
+# 本地留档，不进公开仓库。
+docs/superpowers/plans/2026-08-12-*
