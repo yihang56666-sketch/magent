@@ -40,6 +40,12 @@ the concrete failure mode.
 
 ## Output Contract
 Findings, Evidence, Risks, Open Questions, Recommended Next Action.
+Begin with complete, partial, or blocked status. List inspected and uninspected
+scope; separate executed commands/results from proposed checks.
+
+## Budget
+Soft budget: inspect at most eight scoped source files, run at most four safe
+diagnostics, and return at most 800 words. Return partial evidence if exhausted.
 
 ## Conflict Policy
 Report disagreement and evidence; do not resolve it through edits.

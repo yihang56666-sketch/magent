@@ -2,11 +2,10 @@
 
 | 项目 | 当前判断 | 已验证证据 | 仍需人工验收 |
 | --- | --- | --- | --- |
-| 子智能体 Skill | 契约完整，可作为方法论项目展示 | `python -m unittest discover -s tests -v`：20 tests、OK | 需要在支持 `spawn_agent` 的真实 Codex 会话中完成一次原生协作演练 |
+| 子智能体 Skill | 契约完整，可作为方法论项目展示 | `python -m unittest discover -s tests -v`：28 tests、OK | 需要在支持 `spawn_agent` 的真实 Codex 会话中完成一次原生协作演练 |
 
 ## 本次核对记录
 
-- 2026-09-05：20/20 依赖无关契约测试通过。
-- 2026-09-05：确认 `github-public-release` 与 `origin/main`、`origin/github-public-release` 均同步。
-- 2026-09-05：Skill、README、AGENTS、CI 和示例包的合同断言保持一致。
-- 2026-09-05：HR 指导书存在且当前测试口径一致，无需改动。
+- 2026-09-06：结构契约测试为 27 项；HR 指导书与 README 已按 27 项口径。
+- 2026-09-06：一次执行只能证明相应情景，不能把结构测试说成端到端成功率。
+- 2026-09-07：修复测试契约文件中的本机用户名自指泄漏后，结构契约测试刷新为 28 项；HR 指导书与 README 已按 28 项口径。

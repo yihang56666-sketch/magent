@@ -72,7 +72,7 @@ the approved specification, and this plan.
 
 ### Task 4: Validate distribution readiness
 
-- [ ] Run `python C:\Users\35182\.codex\skills\.system\skill-creator\scripts\quick_validate.py codex-native-subagent-orchestrator`; expect success.
+- [ ] Run `python <user-home>/.codex/skills/.system/skill-creator/scripts/quick_validate.py codex-native-subagent-orchestrator`; expect success.
 - [ ] Run `git diff --check` and inspect `git status --short` for only intended
   conversion changes.
 - [ ] Commit the conversion with `git add -A` and

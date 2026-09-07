@@ -40,12 +40,22 @@ as the user-facing owner.
 
 ## Output Contract
 Findings, Evidence, Risks, Open Questions, Recommended Next Action.
+Begin with Status: complete | partial | blocked. List inspected scope and scope
+not inspected. Separate commands actually executed and observed results from
+commands merely proposed. State uncertainty rather than filling evidence gaps.
+
+## Budget
+<task-specific limits on scoped reads, diagnostic calls, and report length>
+This is a soft budget managed by the main agent, not a native tool parameter or
+hard execution limit. If it is exhausted, return partial evidence and the
+unanswered question; do not expand scope or claim completion.
 
 ## Conflict Policy
 Report disagreement and supporting evidence. Do not resolve it by changing work.
 
 ## Stop Condition
 Stop after answering the mission or identifying a concrete blocker.
+Also stop at the stated soft budget and return the partial/blocked status.
 ```
 
 Keep packets short and task-specific. For a weak or incomplete response, make
