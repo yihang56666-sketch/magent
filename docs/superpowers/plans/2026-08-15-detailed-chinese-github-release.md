@@ -68,7 +68,7 @@ Write a Chinese-first README containing:
 ```markdown
 # Codex 原生子智能体编排 Skill
 
-一句话定位：原生 `spawn_agent` 是执行引擎，本 Skill 是判断、路由、安全、恢复与结果汇总层。
+一句话定位：原生子智能体工具（如 `create_thread`）是执行引擎，本 Skill 是判断、路由、安全、恢复与结果汇总层。
 
 ## 它解决什么问题
 ## 原生子智能体与本 Skill 有什么区别
@@ -89,7 +89,7 @@ Write a Chinese-first README containing:
 ## License
 ```
 
-Retain the existing safe Windows and macOS/Linux installation commands, the portable verification command, the `spawn_agent` prerequisite, and the statement that read-only behavior is instruction plus worktree auditing rather than an independent permission sandbox.
+Retain the existing safe Windows and macOS/Linux installation commands, the portable verification command, the current-session native subagent tool prerequisite, and the statement that read-only behavior is instruction plus worktree auditing rather than an independent permission sandbox.
 
 - [ ] **Step 2: Run the focused test and verify GREEN**
 

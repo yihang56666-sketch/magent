@@ -25,9 +25,12 @@ parallel owners of a task.
 4. Select catalog roles from [the role catalog](references/role-catalog.md). If
    none fits, create one temporary specialist instructed to remain read-only,
    following that file.
-5. Before dispatching, inspect whether native `spawn_agent` is available. If
-   `spawn_agent is unavailable`, say that native delegation cannot run in this
-   session and continue locally; do not simulate agents with prompt-copy files.
+5. Before dispatching, inspect the session schema for native delegation tools
+   actually exposed in this session (for example `create_thread`,
+   `send_message_to_thread`, and `set_thread_archived`). Do not assume fixed
+   tool names. If no native delegation tool is exposed, say that native
+   delegation cannot run in this session and continue locally; do not simulate
+   agents with prompt-copy files.
    In a Git worktree, capture `git status --short`, scoped `git diff --binary`
    and `git diff --cached --binary`, plus content fingerprints of allowed
    files, including pre-existing untracked files. Do not capture secrets or
@@ -35,11 +38,11 @@ parallel owners of a task.
    pre-existing. If this is not a Git repository, skip the Git baseline and
    capture scoped content fingerprints instead. Status alone is insufficient.
 6. Build every packet using [the dispatch contract](references/dispatch-contract.md).
-7. Call `spawn_agent` only for independent evidence work. Give each agent one
-   concrete mission and a non-overlapping question or source scope. Instruct
-   every worker to remain read-only. Dispatch no more than the platform's
-   available concurrency, then launch further independent work only after a
-   slot becomes available.
+7. Create native subagents only for independent evidence work. Give each agent
+   one concrete mission and a non-overlapping question or source scope.
+   Instruct every worker to remain read-only. Dispatch no more than the
+   platform's available concurrency, then launch further independent work only
+   after a slot becomes available.
 8. Continue the identified useful local work while agents run. Do not dispatch
    an immediate blocker merely to wait on it. Waiting is appropriate when an
    existing agent later becomes the next dependency or local work is complete.
@@ -60,11 +63,13 @@ completed, failed, pending, or no longer needed. A wait timeout or empty poll
 means pending, not a stopped agent. Inspect the same handle again; do not spawn
 a replacement merely because an observation timed out.
 
-Use the available native message tool (`send_input` when provided) for a bounded
-follow-up to the original agent. Completed agents still occupy concurrency
-until closed: collect their evidence, then call `close_agent` when no longer
-needed. Record the close request; its returned previous status is not a new
-post-close status. Recheck capacity before assigning another independent task.
+Use the available native message tool (`send_message_to_thread` when exposed in
+this session) for a bounded follow-up to the original agent. Completed agents
+still occupy concurrency until closed: collect their evidence, then close or
+archive them (`set_thread_archived` when exposed in this session) when no
+longer needed. Record the close request; its returned previous status is not a
+new post-close status. Recheck capacity before assigning another independent
+task.
 
 ## Failed Agents
 

@@ -6,8 +6,8 @@ Use only tools actually exposed in the current session and record their schema/v
 
 | Case | Input condition | Required decision and observable evidence |
 | --- | --- | --- |
-| NO-AUTH | A request asks for depth but no user or applicable instruction authorizes delegation. | Keep local; zero spawn calls. Loading this Skill is not sufficient authorization. |
-| IMMEDIATE-BLOCKER | Delegation is authorized, but the question blocks the immediate local step and no independent work exists. | Main agent answers locally; zero spawn calls for that question. |
+| NO-AUTH | A request asks for depth but no user or applicable instruction authorizes delegation. | Keep local; zero native subagent creation calls. Loading this Skill is not sufficient authorization. |
+| IMMEDIATE-BLOCKER | Delegation is authorized, but the question blocks the immediate local step and no independent work exists. | Main agent answers locally; zero native subagent creation calls for that question. |
 | ONE-CRITIQUE | One authorized, bounded independent critique can run alongside useful main-agent work. | One specialist, a complete packet, returned agent ID, and evidence of useful local work. Do not add a second reviewer for reassurance. |
 | WAIT-TIMEOUT | A native wait expires or returns empty while the original handle remains live. | Keep it pending, observe the same handle later, and do not dispatch a replacement. Record the observation separately from task status. |
 | DIRTY-CONTENT | A scoped tracked or existing untracked file changes content while its status text stays unchanged. | Detect the fingerprint/diff change and stop to attribute it. Do not automatically blame an agent, revert, or clean the user's work. |

@@ -2,7 +2,8 @@
 
 All patterns require applicable delegation authorization and a useful next
 local step. Immediate critical-path blockers stay local when no independent
-main-agent work can proceed. A pattern is not permission to spawn agents.
+main-agent work can proceed. A pattern is not permission to create native
+subagents.
 
 ## Parallel evidence gathering
 
@@ -17,10 +18,11 @@ ask a reviewer to challenge the proposed direction. The main agent implements.
 ## Sequential handoff
 
 Use when a later question needs an earlier report, such as researching a public
-API before reviewing its project integration. Do not spawn the dependent agent
-until its input exists.
+API before reviewing its project integration. Do not create the dependent
+native subagent until its input exists.
 When that input arrives, reapply the rubric: if the dependent question now
-blocks all useful main-agent work, answer it locally instead of spawning.
+blocks all useful main-agent work, answer it locally instead of creating a
+subagent.
 
 ## Supervisor-led analysis
 

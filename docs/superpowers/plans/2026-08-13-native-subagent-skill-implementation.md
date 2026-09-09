@@ -31,9 +31,10 @@ README.md
 
 **Files:** Create `tests/test_skill_contract.py`.
 
-- [ ] Write a test that checks `SKILL.md` frontmatter, `spawn_agent`, all four
-  reference files, `agents/openai.yaml`, the phrases `read-only`, `one to
-  three`, `fourth`, and `main agent`.
+- [ ] Write a test that checks `SKILL.md` frontmatter, current-session tool
+  language (for example `create_thread`), all four reference files,
+  `agents/openai.yaml`, the phrases `read-only`, `one to three`, `fourth`, and
+  `main agent`.
 - [ ] Run `python -m unittest tests.test_skill_contract -v` and observe failure
   because the new Skill is absent.
 
@@ -43,8 +44,8 @@ README.md
 above.
 
 - [ ] Make `SKILL.md` decide keep-local versus delegation, choose the smallest
-  team and pattern, construct packets, call `spawn_agent` only for independent
-  read-only work, and require main-agent synthesis and edits.
+  team and pattern, construct packets, create native subagents only for
+  independent read-only work, and require main-agent synthesis and edits.
 - [ ] Add catalog roles: explorer, domain analyst, reviewer, test analyst,
   security reviewer, documentation researcher, and architect. Dynamic roles
   require one mission, explicit scope, evidence needs, and a stop condition.

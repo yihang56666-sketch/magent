@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 import re
 import subprocess
 import unittest
@@ -8,28 +9,47 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "codex-native-subagent-orchestrator"
 README = ROOT / "README.md"
 
+TEXT_SUFFIXES = {".md", ".py", ".yml", ".yaml", ".json", ".toml", ".txt"}
+IGNORED_DIRS = {".git", ".worktrees", ".pytest_cache", "__pycache__", "node_modules"}
+
+
+def iter_text_files(root: Path):
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [name for name in dirnames if name not in IGNORED_DIRS]
+        for name in filenames:
+            path = Path(dirpath) / name
+            if path.suffix.lower() in TEXT_SUFFIXES:
+                yield path
+
 
 class SkillContractTests(unittest.TestCase):
     def test_repository_text_files_do_not_expose_machine_specific_paths(self) -> None:
-        completed = subprocess.run(
-            ["git", "ls-files", "-z"],
-            cwd=ROOT,
-            check=True,
-            capture_output=True,
-        )
-        tracked_files = [
-            Path(entry)
-            for entry in completed.stdout.decode("utf-8").split("\0")
-            if entry and Path(entry).suffix.lower() in {".md", ".py", ".yml", ".yaml", ".json", ".toml", ".txt"}
-        ]
         private_path = re.compile("D:" + "[\\\\/]|C:" + "[\\\\/]Users|" + "35" + "182")
-        leaks = [
-            path.as_posix()
-            for path in tracked_files
-            if private_path.search(path.read_text(encoding="utf-8", errors="ignore"))
-        ]
+        leaks = []
+        for path in iter_text_files(ROOT):
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            if private_path.search(text):
+                leaks.append(path.as_posix())
 
         self.assertEqual(leaks, [])
+
+    def test_local_claude_settings_do_not_contain_broad_permissions(self) -> None:
+        dangerous_patterns = (
+            "rm -f",
+            "del /Q",
+            "os.remove",
+            "pip install *",
+            "pip install -q",
+            "spawn-team.py",
+            "magent.exe",
+            "build.py",
+            "--scope",
+            "Bash(",
+        )
+        for settings in ROOT.glob(".claude/*.json"):
+            text = settings.read_text(encoding="utf-8", errors="ignore")
+            for pattern in dangerous_patterns:
+                self.assertNotIn(pattern, text, f"{settings.name} contains {pattern!r}")
 
     def test_workflow_requires_authorization_and_an_immediate_local_step(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
@@ -59,7 +79,7 @@ class SkillContractTests(unittest.TestCase):
     def test_collection_distinguishes_pending_results_from_failed_agents(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
         collection = text.split("## Collection Rule", 1)[1].split("## Failed Agents", 1)[0]
-        for invariant in ("agent ID", "pending", "wait timeout", "send_input", "close_agent"):
+        for invariant in ("agent ID", "pending", "wait timeout", "send_message_to_thread", "set_thread_archived"):
             self.assertIn(invariant, collection)
         self.assertIn("still occupy concurrency", collection)
         self.assertNotIn("If an agent fails, times out", text)
@@ -83,7 +103,7 @@ class SkillContractTests(unittest.TestCase):
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
 
         self.assertIn("name: codex-native-subagent-orchestrator", text)
-        self.assertIn("spawn_agent", text)
+        self.assertIn("actually exposed in this session", text)
         self.assertTrue((SKILL / "agents" / "openai.yaml").is_file())
 
         for reference in (
@@ -93,6 +113,17 @@ class SkillContractTests(unittest.TestCase):
             "workflow-patterns.md",
         ):
             self.assertTrue((SKILL / "references" / reference).is_file())
+
+    def test_skill_discovers_native_tools_from_the_current_schema(self) -> None:
+        text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+
+        self.assertIn("actually exposed in this session", text)
+        self.assertIn("create_thread", text)
+        self.assertIn("send_message_to_thread", text)
+        self.assertIn("set_thread_archived", text)
+        self.assertNotIn("spawn_agent", text)
+        self.assertNotIn("send_input", text)
+        self.assertNotIn("close_agent", text)
 
     def test_description_is_a_short_activation_rule(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
@@ -119,7 +150,7 @@ class SkillContractTests(unittest.TestCase):
     def test_skill_checks_native_capacity_before_dispatching(self) -> None:
         text = " ".join((SKILL / "SKILL.md").read_text(encoding="utf-8").split())
 
-        self.assertIn("spawn_agent is unavailable", text)
+        self.assertIn("no native delegation tool is exposed", text)
         self.assertIn("platform's available concurrency", text)
 
     def test_skill_preserves_preexisting_worktree_changes(self) -> None:
@@ -155,7 +186,17 @@ class SkillContractTests(unittest.TestCase):
         text = README.read_text(encoding="utf-8")
 
         self.assertIn("native subagent support", text)
-        self.assertIn("spawn_agent", text)
+        self.assertIn("create_thread", text)
+
+    def test_readme_uses_current_session_tool_language(self) -> None:
+        text = README.read_text(encoding="utf-8")
+
+        self.assertIn("实际会话 schema", text)
+        self.assertIn("create_thread", text)
+        self.assertIn("set_thread_archived", text)
+        self.assertNotIn("spawn_agent", text)
+        self.assertNotIn("send_input", text)
+        self.assertNotIn("close_agent", text)
 
     def test_readme_is_a_detailed_chinese_product_guide(self) -> None:
         text = README.read_text(encoding="utf-8")
@@ -213,6 +254,20 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("windows-latest", text)
         self.assertIn('"on":', text)
 
+    def test_openai_metadata_requires_explicit_authorization(self) -> None:
+        yaml = (SKILL / "agents" / "openai.yaml").read_text(encoding="utf-8")
+
+        self.assertIn("allow_implicit_invocation: false", yaml)
+
+    def test_acceptance_record_exists_and_labels_its_limits(self) -> None:
+        records = sorted((ROOT / "output" / "readiness").glob("acceptance-*.md"))
+        self.assertTrue(records, "expected at least one native acceptance record")
+
+        text = records[-1].read_text(encoding="utf-8")
+        self.assertIn("真实", text)
+        self.assertIn("不证明", text)
+        self.assertIn("证据", text)
+
     def test_skill_handles_failed_or_missing_agent_results(self) -> None:
         text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
 
@@ -250,9 +305,13 @@ class SkillContractTests(unittest.TestCase):
         text = " ".join((SKILL / "SKILL.md").read_text(encoding="utf-8").split())
 
         for rule in (
-            "spawn_agent is unavailable",
+            "no native delegation tool is exposed",
             "platform's available concurrency",
             "at most one narrowly scoped replacement",
             "Collect every started agent",
         ):
             self.assertIn(rule, text)
+
+
+if __name__ == "__main__":
+    unittest.main()
