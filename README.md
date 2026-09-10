@@ -1,8 +1,21 @@
-# Codex 原生子智能体编排 Skill
+# magent — Codex 原生子智能体编排 Skill
 
 一个帮助 Codex 主智能体判断、路由和汇总原生子智能体工作的通用 Skill。
 
-一句话定位：当前会话实际暴露的原生子智能体工具（例如 `create_thread`）是执行引擎，本 Skill 是决策、路由、安全、恢复与结果汇总层。它不是独立的多智能体运行时，也不会替主智能体接管最终写入和交付责任。
+一句话定位：当前会话实际暴露的原生子智能体工具（例如 `create_thread`）是执行引擎，magent 是决策、路由、安全、恢复与结果汇总层。它不是独立的多智能体运行时，也不会替主智能体接管最终写入和交付责任。
+
+```mermaid
+flowchart LR
+  A[主智能体] --> B{分派判断}
+  B -->|不值得分派| L[本地执行]
+  B -->|值得分派| C[只读子智能体<br/>1–3 个]
+  C --> D[证据回收]
+  D --> E[主智能体核验与写入]
+```
+
+```text
+主智能体 → 分派判断 → 只读子智能体 → 证据回收 → 主智能体写入
+```
 
 ## 它解决什么问题
 
@@ -134,12 +147,20 @@ cp -R ./codex-native-subagent-orchestrator "$target"
 ## 仓库结构
 
 ```text
-codex-native-subagent-orchestrator/
-  SKILL.md                 运行时编排流程
-  references/              分派准则、角色、契约和工作流模式
-  examples/                缺陷、审查和研究分派示例
-  agents/openai.yaml       Codex 界面元数据
-tests/                     无依赖结构契约测试
+magent/
+  README.md                              本文件（产品说明与安装）
+  AGENTS.md                              仓库协作与验证约定
+  LICENSE / CODE_OF_CONDUCT.md           许可证与行为准则
+  CONTRIBUTING.md                        贡献与协议修改指引
+  codex-native-subagent-orchestrator/    Codex Skill 本体
+    SKILL.md                             运行时编排流程
+    references/                          分派准则、角色、契约和工作流模式
+    examples/                            缺陷、审查和研究分派示例
+    agents/openai.yaml                   Codex 界面元数据
+  tests/                                 无依赖结构契约测试
+  docs/                                  HR 讲解、审计与设计/计划文档
+  output/readiness/                      契约测试日志与验收记录
+  .github/workflows/ci.yml               无依赖 CI 检查
 ```
 
 ## 验证
@@ -148,11 +169,17 @@ tests/                     无依赖结构契约测试
 python -m unittest discover -s tests -v
 ```
 
+Windows 上若控制台编码异常，可改用：
+
+```powershell
+python -X utf8 -B -m unittest discover -s tests -v
+```
+
 如果本机安装了 OpenAI `skill-creator` Skill，也可以使用其中的 `quick_validate.py` 检查 `codex-native-subagent-orchestrator/`。没有该验证器时，以仓库自带契约测试为准，不虚构验证结果。
 
-2026-09-09 本轮结构契约测试为 33 项。它们检查元数据、条款位置、人数映射、分派包、验收案例、全目录隐私扫描、本地危险权限和契约自指防泄漏的完整性，**不证明模型一定遵循指令**。真实运行需按 [原生验收案例](codex-native-subagent-orchestrator/references/acceptance-cases.md) 记录工具调用、证据和工作区内容变化。
+2026-09-09 本轮结构契约测试为 33 项。它们检查元数据、条款位置、人数映射、分派包、验收案例、全目录隐私扫描、本地危险权限和契约自指防泄漏的完整性，**不证明模型一定遵循指令**。真实运行需按 [原生验收案例](codex-native-subagent-orchestrator/references/acceptance-cases.md) 记录工具调用、证据和工作区内容变化。历史绿灯日志见 `output/readiness/skill-contract-green.log`。
 
-项目讲解见 [面试指导书](docs/HR_PROJECT_GUIDE.md)，验证范围与限制见 [审查记录](docs/PROJECT_PORTFOLIO_AUDIT.md)。
+项目讲解见 [面试指导书](docs/HR_PROJECT_GUIDE.md)，验证范围与限制见 [审查记录](docs/PROJECT_PORTFOLIO_AUDIT.md)。参与改进请阅读 [贡献指南](CONTRIBUTING.md)；本产品对外统一称 **magent — Codex 原生子智能体编排 Skill**，安装目录名仍为 `codex-native-subagent-orchestrator`。
 
 ## 限制与非目标
 
